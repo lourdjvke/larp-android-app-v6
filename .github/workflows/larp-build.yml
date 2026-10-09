@@ -43,14 +43,14 @@ jobs:
         run: |
           echo "=========================================="
           echo "LARP Pure Native Android CI/CD Pipeline"
-          echo "App: Lionel App (com.lourdjvke.lionel)"
+          echo "App: MultiFileApp (com.lourdjvke.multifile)"
           echo "Target SDK: 34 (Android 14+ Ready)"
           echo "=========================================="
 
           WORK_DIR="build_workspace"
           GEN_DIR="$WORK_DIR/gen"
           BIN_DIR="$WORK_DIR/bin"
-          SRC_DIR="$WORK_DIR/src/com/lourdjvke/lionel"
+          SRC_DIR="$WORK_DIR/src/com/lourdjvke/multifile"
           RES_DIR="$WORK_DIR/res"
           DRAWABLE_DIR="$RES_DIR/drawable"
           VALUES_DIR="$RES_DIR/values"
@@ -68,7 +68,7 @@ jobs:
 
           # 2. Write Android resources (strings.xml, colors.xml, styles.xml)
           cat << 'EOF' > "$VALUES_DIR/strings.xml"
-          <resources><string name="app_name">Lionel App</string></resources>
+          <resources><string name="app_name">MultiFileApp</string></resources>
           EOF
 
           cat << 'EOF' > "$VALUES_DIR/colors.xml"
@@ -89,8 +89,8 @@ jobs:
           cat << 'EOF' > "$WORK_DIR/AndroidManifest.xml"
           <?xml version="1.0" encoding="utf-8"?>
           <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-              package="com.lourdjvke.lionel"
-              android:versionCode="101"
+              package="com.lourdjvke.multifile"
+              android:versionCode="102"
               android:versionName="1.0.0">
 
               <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="34" />
@@ -112,14 +112,14 @@ jobs:
               <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
               <application
-                  android:label="Lionel App"
+                  android:label="MultiFileApp"
                   android:theme="@style/AppTheme"
                   android:hardwareAccelerated="true"
                   android:allowBackup="true">
 
                   <activity
-                      android:name="com.lourdjvke.lionel.MainActivity"
-                      android:label="Lionel App"
+                      android:name="com.lourdjvke.multifile.MainActivity"
+                      android:label="MultiFileApp"
                       android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale"
                       android:exported="true"
                       android:launchMode="singleTask">
@@ -129,9 +129,9 @@ jobs:
                   </activity>
 
                   <activity-alias
-                      android:name="com.lourdjvke.lionel.MainActivity_default"
-                      android:targetActivity="com.lourdjvke.lionel.MainActivity"
-                      android:label="Lionel App"
+                      android:name="com.lourdjvke.multifile.MainActivity_default"
+                      android:targetActivity="com.lourdjvke.multifile.MainActivity"
+                      android:label="MultiFileApp"
                       android:enabled="true"
                       android:exported="true">
                       <intent-filter>
@@ -146,7 +146,7 @@ jobs:
 
           # 4. Write MainActivity.java
           cat << 'EOF' > "$SRC_DIR/MainActivity.java"
-          package com.lourdjvke.lionel;
+          package com.lourdjvke.multifile;
           import android.app.Activity;
           import android.os.Build;
           import android.os.Bundle;
@@ -160,6 +160,7 @@ jobs:
           import android.webkit.WebSettings;
           import android.webkit.WebView;
           import android.webkit.WebViewClient;
+          import android.webkit.WebChromeClient;
           import android.widget.FrameLayout;
           import android.graphics.Color;
           import android.content.ComponentName;
@@ -197,6 +198,7 @@ jobs:
                   settings.setUseWideViewPort(true);
 
                   webView.addJavascriptInterface(new LarpNativeInterface(), "LarpNative");
+                  webView.setWebChromeClient(new WebChromeClient());
 
                   splashView = new View(this);
                   splashView.setLayoutParams(new FrameLayout.LayoutParams(
@@ -204,6 +206,14 @@ jobs:
                   splashView.setBackgroundColor(Color.parseColor(DEFAULT_THEME_COLOR));
 
                   webView.setWebViewClient(new WebViewClient() {
+                      @Override
+                      public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                          if (url != null && (url.startsWith("file://") || url.startsWith("data:") || url.startsWith("javascript:"))) {
+                              return false;
+                          }
+                          return false;
+                      }
+
                       @Override
                       public void onPageFinished(WebView view, String url) {
                           super.onPageFinished(view, url);
@@ -222,6 +232,15 @@ jobs:
                   rootLayout.addView(splashView);
                   setContentView(rootLayout);
                   webView.loadUrl("file:///android_asset/public/index.html");
+              }
+
+              @Override
+              public void onBackPressed() {
+                  if (webView != null && webView.canGoBack()) {
+                      webView.goBack();
+                  } else {
+                      super.onBackPressed();
+                  }
               }
 
               public void applyThemeColor(final String hexColor) {
@@ -268,7 +287,7 @@ jobs:
           echo "Using android.jar: $ANDROID_JAR"
 
           aapt package -m -J "$GEN_DIR" -M "$WORK_DIR/AndroidManifest.xml" -S "$RES_DIR" -I "$ANDROID_JAR" --min-sdk-version 21 --target-sdk-version 34
-          javac -cp "$ANDROID_JAR" -d "$BIN_DIR" -source 8 -target 8 "$GEN_DIR/com/lourdjvke/lionel/R.java" "$SRC_DIR/MainActivity.java"
+          javac -cp "$ANDROID_JAR" -d "$BIN_DIR" -source 8 -target 8 "$GEN_DIR/com/lourdjvke/multifile/R.java" "$SRC_DIR/MainActivity.java"
           dx --dex --output="$WORK_DIR/classes.dex" "$BIN_DIR"
 
           aapt package -f -M "$WORK_DIR/AndroidManifest.xml" -S "$RES_DIR" -A "$ASSETS_DIR" -I "$ANDROID_JAR" --min-sdk-version 21 --target-sdk-version 34 -F "$WORK_DIR/unsigned.apk"
@@ -276,13 +295,13 @@ jobs:
 
           zipalign -f -p 4 "$WORK_DIR/unsigned.apk" "$WORK_DIR/aligned.apk"
 
-          keytool -genkeypair -v -keystore release.keystore -alias larp_release -keyalg RSA -keysize 2048 -validity 9125 -storepass larp_keystore_password_2026 -keypass larp_keystore_password_2026 -dname "CN=Lionel App, OU=LARP, O=LARP Engineering, C=US"
+          keytool -genkeypair -v -keystore release.keystore -alias larp_release -keyalg RSA -keysize 2048 -validity 9125 -storepass larp_keystore_password_2026 -keypass larp_keystore_password_2026 -dname "CN=MultiFileApp, OU=LARP, O=LARP Engineering, C=US"
 
           apksigner sign --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true --ks release.keystore --ks-pass pass:larp_keystore_password_2026 --ks-key-alias larp_release --out signed_release.apk "$WORK_DIR/aligned.apk"
 
           mkdir -p build_output
           cp signed_release.apk build_output/lionel.apk
-          cp signed_release.apk build_output/lionel_app_signed_release.apk
+          cp signed_release.apk build_output/multifileapp_signed_release.apk
           cp release.keystore build_output/larp_release.keystore
 
           echo "Build artifacts generated successfully!"
