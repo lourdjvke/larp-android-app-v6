@@ -157,7 +157,30 @@ jobs:
                       </intent-filter>
                   </activity-alias>
 
-
+                  <activity-alias
+                      android:name="com.larp.abadon.MainActivity_streak_fire"
+                      android:targetActivity="com.larp.abadon.MainActivity"
+                      android:icon="@mipmap/ic_launcher_streak_fire"
+                      android:label="Abadon"
+                      android:enabled="false"
+                      android:exported="true">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.category.LAUNCHER" />
+                      </intent-filter>
+                  </activity-alias>
+                  <activity-alias
+                      android:name="com.larp.abadon.MainActivity_stealth_dark"
+                      android:targetActivity="com.larp.abadon.MainActivity"
+                      android:icon="@mipmap/ic_launcher_stealth_dark"
+                      android:label="Abadon"
+                      android:enabled="false"
+                      android:exported="true">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.category.LAUNCHER" />
+                      </intent-filter>
+                  </activity-alias>
 
               </application>
           </manifest>
@@ -289,7 +312,7 @@ jobs:
                               PackageManager pm = getPackageManager();
                               String pkg = getPackageName();
                               String target = (targetVariantId == null || targetVariantId.trim().isEmpty()) ? "default" : targetVariantId.trim();
-                              String[] allVariants = new String[] { "default",  };
+                              String[] allVariants = new String[] { "default", "streak_fire", "stealth_dark" };
 
                               ComponentName targetAlias = new ComponentName(pkg, pkg + ".MainActivity_" + target);
                               pm.setComponentEnabledSetting(targetAlias, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
