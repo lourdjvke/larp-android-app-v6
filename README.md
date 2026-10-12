@@ -1,2 +1,2 @@
-# Roulette Royale (LARP Android Build)
-Generated: 2026-10-12T01:19:24.168Z
+# Zenith Kinetic (True Fullscreen) (LARP Android Build)
+Generated: 2026-10-12T01:44:06.082Z
