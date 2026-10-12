@@ -43,7 +43,7 @@ jobs:
         run: |
           echo "=========================================="
           echo "LARP Pure Native Android CI/CD Pipeline"
-          echo "App: Wellness & Habit Dashboard (com.lbuild.leodak79t9)"
+          echo "App: Wellness and Habit Dashboard (com.lbuild.leodak79t9)"
           echo "Target SDK: 34 (Android 14+ Ready)"
           echo "=========================================="
 
@@ -76,12 +76,12 @@ jobs:
             cp "$RES_DIR/drawable/ic_launcher.png" "$RES_DIR/mipmap/ic_launcher.png"
           fi
           if [ ! -f "$ASSETS_DIR/public/index.html" ]; then
-            echo "<!DOCTYPE html><html><body><h1>Wellness & Habit Dashboard</h1></body></html>" > "$ASSETS_DIR/public/index.html"
+            echo "<!DOCTYPE html><html><body><h1>Wellness and Habit Dashboard</h1></body></html>" > "$ASSETS_DIR/public/index.html"
           fi
 
           # 2. Write Android resources (strings.xml, colors.xml, styles.xml)
           cat << 'EOF' > "$VALUES_DIR/strings.xml"
-          <resources><string name="app_name">Wellness & Habit Dashboard</string></resources>
+          <resources><string name="app_name">Wellness and Habit Dashboard</string></resources>
           EOF
 
           cat << 'EOF' > "$VALUES_DIR/colors.xml"
@@ -124,7 +124,7 @@ jobs:
               <uses-permission android:name="android.permission.WAKE_LOCK" />
 
               <application
-                  android:label="Wellness & Habit Dashboard"
+                  android:label="Wellness and Habit Dashboard"
                   android:icon="@mipmap/ic_launcher"
                   android:theme="@style/AppTheme"
                   android:hardwareAccelerated="true"
@@ -132,7 +132,7 @@ jobs:
 
                   <activity
                       android:name="com.lbuild.leodak79t9.MainActivity"
-                      android:label="Wellness & Habit Dashboard"
+                      android:label="Wellness and Habit Dashboard"
                       android:icon="@mipmap/ic_launcher"
                       android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale"
                       android:exported="true"
@@ -147,7 +147,7 @@ jobs:
                       android:name="com.lbuild.leodak79t9.MainActivity_default"
                       android:targetActivity="com.lbuild.leodak79t9.MainActivity"
                       android:icon="@mipmap/ic_launcher"
-                      android:label="Wellness & Habit Dashboard"
+                      android:label="Wellness and Habit Dashboard"
                       android:enabled="true"
                       android:exported="true">
                       <intent-filter>
@@ -351,12 +351,12 @@ jobs:
 
           zipalign -f -p 4 "$WORK_DIR/unsigned.apk" "$WORK_DIR/aligned.apk"
 
-          keytool -genkeypair -v -keystore release.keystore -alias larp_release -keyalg RSA -keysize 2048 -validity 9125 -storepass larp_keystore_password_2026 -keypass larp_keystore_password_2026 -dname "CN=Wellness & Habit Dashboard, OU=LARP, O=LARP Engineering, C=US"
+          keytool -genkeypair -v -keystore release.keystore -alias larp_release -keyalg RSA -keysize 2048 -validity 9125 -storepass larp_keystore_password_2026 -keypass larp_keystore_password_2026 -dname "CN=Wellness and Habit Dashboard, OU=LARP, O=LARP Engineering, C=US"
 
           apksigner sign --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true --ks release.keystore --ks-pass pass:larp_keystore_password_2026 --ks-key-alias larp_release --out signed_release.apk "$WORK_DIR/aligned.apk"
 
           mkdir -p build_output
-          cp signed_release.apk build_output/wellness___habit_dashboard_signed_release.apk
+          cp signed_release.apk build_output/wellness_and_habit_dashboard_signed_release.apk
           cp release.keystore build_output/larp_release.keystore
 
           echo "Build artifacts generated successfully!"
@@ -365,6 +365,6 @@ jobs:
       - name: Upload Build Artifacts (APK, Keystore)
         uses: actions/upload-artifact@v4
         with:
-          name: wellness___habit_dashboard-release
+          name: wellness_and_habit_dashboard-release
           path: build_output/*
           retention-days: 30
