@@ -1,2 +1,2 @@
-# Wellness & Habit Dashboard (LARP Android Build)
-Generated: 2026-10-12T15:11:41.209Z
+# Lionel App (LARP Android Build)
+Generated: 2026-10-13T01:26:53.240Z
